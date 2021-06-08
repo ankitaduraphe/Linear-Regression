@@ -1,0 +1,445 @@
+---
+title: "Linear Regression"
+author: "18BCE1104 - Ankita Duraphe"
+date: "04/02/2021"
+output:
+  word_document: default
+  html_document:
+    fig_height: 4
+    highlight: pygments
+    theme: spacelab
+---
+
+### Regression Analysis on sample data
+
+* * *
+Consider the following 5 training examples:
+X = [2 3 4 5 6], 
+Y = [12.8978, 17.7586, 23.3192, 28.3129, 32.1351]
+We want to learn a function f(x) of the form f(x) = a(x) + b which is parametrized by (a, b). Using squared error as the loss function, which of the following parameters would you like to use to model this function.
+
+* * * 
+Create a dataframe for the given data
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+data <- data.frame(x = c(2, 3, 4, 5, 6), y = c(12.8978, 17.7586, 23.3192, 28.3129, 32.1351))
+data
+```
+
+* * * 
+View the dataset
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+head(data)
+```
+
+* * *
+Number of rows and columns in the dataset
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+nrow(data)
+ncol(data)
+```
+
+* * *
+Checking summary(Mean, Mode, Median)
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+summary(data)
+```
+
+* * *
+Check missing values
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+# is.na(mtcars)
+```
+
+* * * 
+Plot
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(ggplot2)
+ggplot(data, aes(x = x, y = y)) +
+  geom_point() +
+  stat_smooth()
+```
+
+* * *
+Autocorrelation
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+cor(data$y, data$x)
+```
+
+* * * 
+Applying Linear Regression Model
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+fit <- lm(y ~ x, data)
+```
+
+* * *
+Checking Summary after applying Linear Regression to the Model
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+model <- lm(y ~ x, data = data)
+model
+```
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+summary(model)
+```
+
+* * *
+**SE** 
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(plotrix)
+std.error(data$y,na.rm)
+```
+
+* * *
+**RSS**
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(qpcR)
+RSS(model)
+```
+
+* * *
+**95% Confidence Interval**
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+new.dat <- data.frame(x=10)
+predict(model, newdata = new.dat, interval = 'confidence')
+```
+
+From the output, the fitted stopping y at x = 10 is just above 52. The confidence interval of (48.9886, 55.61552) signifies the range in which the true population parameter lies at a 95% level of confidence.
+
+* * *
+**RSE Statistic** \
+From the summary of the fitted model, Residual Standard Error: 0.5341 (on 3 degrees of freedom).
+
+* * *
+Visualization
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+ggplot(data, aes(x, y)) +
+  geom_point() +
+  stat_smooth(method = lm)
+```
+
+* * *
+Plotting multiple graphs
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+par(mfrow=c(2,2))
+plot((fit))
+```
+
+### Linear Regression on Age and Height dataset
+
+* * *
+Load the required libraries
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(ggpubr)
+library(ggplot2)
+library(readxl)
+library(plotrix)
+```
+
+* * *
+Upload the data
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+ageandheight = read_excel("ageandheight.xls") 
+```
+
+* * *
+View the dataset
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+View(ageandheight)
+```
+
+* * *
+Regression - components: 1. independence of observation / autocorrelation
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+cor(ageandheight$age, ageandheight$height)
+```
+
+* * *
+Regression - components: 2. normality / histogram
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+hist(ageandheight$height)
+```
+
+* * *
+Regression - components: 3.linearity 
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+plot(height~age, data = ageandheight)
+```
+
+Regression - components: 4.Homoscedasticity / homogeneity of variance <after regression model>
+
+* * *
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight = lm(height~age, data = ageandheight)
+```
+
+* * *
+for residual plots
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+plot(lmHeight$residuals, pch = 16, col = "red")
+```
+
+* * *
+Review the results
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+summary(lmHeight)
+```
+
+* * *
+Regression - components: 4.Homoscedasticity / homogeneity of variance
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+par(mfrow=c(2,2))
+plot(lmHeight)
+```
+
+* * *
+To go back to plotting one graph in the entire window
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+par(mfrow=c(1,1))
+```
+
+* * *
+plot the data points on graph
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight.graph = ggplot(ageandheight, aes(x=age,y=height))+ geom_point()
+lmHeight.graph
+```
+
+* * *
+Add the linear regression line to the plotted data
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight.graph = lmHeight.graph + geom_smooth(method ="lm", col="black")
+lmHeight.graph
+```
+
+* * *
+Add the equation for the regression line
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight.graph = lmHeight.graph + stat_regline_equation()
+lmHeight.graph
+```
+
+* * *
+Make the graph ready for publication
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight.graph + theme_bw() + labs(title = "Chart between Age vs Height", x = "Age in Years", y = "Height in cms")
+```
+
+* * *
+When a regression takes into account two or more predictors to create the linear regression, it's called multiple linear regression.  Height = a + Age × b1 + (Number of Siblings} × b2
+Create a linear regression with two variables
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight2 = lm(height~age + no_siblings, data = ageandheight) 
+```
+
+* * *
+for residual plots
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+plot(lmHeight2$residuals, pch = 16, col = "red")
+```
+
+* * *
+Review the results
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+summary(lmHeight2) 
+```
+
+* * *
+Detect Influential Points.
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+ageandheight[2, 2] = 7.7
+head(ageandheight)
+```
+
+* * *
+regression with outliers
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+lmHeight3 = lm(height~age, data = ageandheight)
+summary(lmHeight3)
+```
+
+* * *
+**SE** 
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(plotrix)
+std.error(ageandheight$height,na.rm)
+```
+
+* * *
+**RSS**
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(qpcR)
+RSS(lmHeight3)
+```
+
+* * *
+**95% Confidence Interval**
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+new.dat <- data.frame(age=50)
+predict(lmHeight3, newdata = new.dat, interval = 'confidence')
+```
+
+From the output, the fitted stopping height at an age of 50 is just above 148 cm. The confidence interval of (52.62959, 244.7543) signifies the range in which the true population parameter lies at a 95% level of confidence.
+
+* * *
+**RSE Statistic** \
+From the summary of the fitted model, Residual Standard Error: 19.29 (on 10 degrees of freedom).
+
+* * *
+Plot the Cooks Distances
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+plot(cooks.distance(lmHeight3), pch = 16, col = "blue") 
+```
+
+### Linear Regression on mtcars dataset
+
+* * *
+Load the required libraries
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(ggpubr)
+library(ggplot2)
+```
+
+* * *
+sorting examples using mtcars dataset
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+attach(mtcars)
+View(mtcars)
+```
+
+* * *
+Pre-processing: Converting "am" into a categorical variable by assigning AT(Automatic Transmission) = 0, MT(Manual Transmission) = 1
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+mtData<-mtcars
+mtData$am <- as.factor(mtData$am)
+levels(mtData$am) <-c("AT", "MT")
+```
+
+* * *
+Exploratory Analysis
+
+1. Histogram of Mpg
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+hist(mtcars$mpg,breaks = 10,xlab="MPG")
+```
+
+* * *
+2. Boxplot of mpg and am
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(ggplot2)
+library(caret)
+ggplot(mtData, aes(x=am, y=mpg)) + geom_boxplot()
+```
+
+* * *
+Statistical Analysis
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+set.seed(12345)
+t.test(mtData$mpg~mtData$am)
+```
+
+* * *
+Model Building
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+fit<-lm(mpg~as.numeric(am),data=mtData)
+summary(fit)
+```
+
+* * *
+**SE** 
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(plotrix)
+std.error(mpg,na.rm)
+```
+
+* * *
+**RSS**
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+library(qpcR)
+RSS(fit)
+```
+
+* * *
+**95% Confidence Interval**
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+new.dat <- data.frame(am=1)
+predict(fit, newdata = new.dat, interval = 'confidence')
+```
+
+From the output, the fitted stopping mpg at am = 1 is just above 17. The confidence interval of (14.85062, 19.44411) signifies the range in which the true population parameter lies at a 95% level of confidence.
+
+* * *
+**RSE Statistic** \
+From the summary of the fitted model, Residual Standard Error: 4.902 (on 30 degrees of freedom).
+
+* * *
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+fit_all<-lm(mpg~.,data=mtData)
+```
+
+* * *
+Residual Error Plot
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+plot(fit_all$resid) 
+```
+
+* * *
+Residual plot
+
+```{r, warning=FALSE, message=FALSE, tidy=TRUE}
+#hist(fit_all$resid, main="Histogram of Residuals", ylab="Residuals")
+qqnorm(fit_all$resid)   
+qqline(fit_all$resid)
+```
+
+* * *
+**Conclusion:** \
+Simple Linear & Multiple Linear Regression Analysis have been successfully performed on a sample data, ageandheight and mtcars dataset including SE, RSS, 95% Confidence Interval and RSE Statistic.
